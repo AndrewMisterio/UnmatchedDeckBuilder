@@ -1,5 +1,6 @@
 package andrew.misterio05.app
 
+import andrew.misterio05.app.card.CardAppearance
 import andrew.misterio05.app.card.CardData
 import andrew.misterio05.app.card.CardView
 import andrew.misterio05.app.theme.AppTheme
@@ -25,9 +26,9 @@ internal fun App() = AppTheme(useDarkTheme = true) {
             type = CardData.Type.Standard.atk(
                 value = 3,
                 description = CardData.Type.Description.Combat(
-                    basic = "basic",
+                    /*basic = "basic",
                     immediateText = "immediateText",
-                    duringText = "duringText",
+                    duringText = "duringText",*/
                     afterText = "afterText",
                 )
             ),
@@ -36,9 +37,11 @@ internal fun App() = AppTheme(useDarkTheme = true) {
             imageUrl = "https://wiki.jcdn.ru/w/images/thumb/f/f3/Suigadan.jpg/450px-Suigadan.jpg",
             quantity = 2,
         ),
-        contentColor = Color.White,
-        backgroundColor = Color.Black,
-        borderColor = borderColor,
+        appearance = CardAppearance(
+            contentColor = Color.White,
+            backgroundColor = Color.Black,
+            borderColor = borderColor,
+        ),
     )
 }
 

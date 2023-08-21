@@ -32,7 +32,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.onSizeChanged
@@ -71,24 +70,28 @@ private val cardTextStyle = TextStyle(
     ),
 )
 
+data class CardAppearance(
+    val contentColor: Color,
+    val backgroundColor: Color,
+    val borderColor: Color,
+)
+
 @Composable
 fun CardView(
     modifier: Modifier,
     data: CardData,
-    contentColor: Color,
-    backgroundColor: Color,
-    borderColor: Color,
+    appearance: CardAppearance,
 ) = CompositionLocalProvider(
     LocalTextStyle provides cardTextStyle,
-    LocalContentColor provides contentColor,
+    LocalContentColor provides appearance.contentColor,
 ) {
     Box(modifier = modifier) {
-        var boostPositionY by remember { mutableStateOf(0) }
+        var boostPosition by remember { mutableStateOf(IntOffset.Zero) }
         Column(
             modifier = Modifier
                 .padding(16.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(backgroundColor)
+                .background(appearance.backgroundColor)
         ) {
             Box(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -99,15 +102,17 @@ fun CardView(
                     contentDescription = "Image of card",
                     contentScale = ContentScale.Crop,
                 )
-                Shevron(
+                ChevronView(
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .offset(x = -BorderWidth, y = -BorderWidth)
+                        .clip(ChevronShape)
                         .border(
-                            color = borderColor,
+                            color = appearance.borderColor,
                             width = BorderWidth,
+                            shape = ChevronShape,
                         )
-                        .background(backgroundColor),
+                        .background(appearance.backgroundColor),
                     icon = data.type.icon,
                     typeColor = data.type.color,
                     value = data.type.value,
@@ -118,9 +123,13 @@ fun CardView(
             Spacer(
                 Modifier.fillMaxWidth()
                     .height(BorderWidth)
-                    .background(borderColor)
+                    .background(appearance.borderColor)
                     .onPlaced {
-                        boostPositionY = (it.positionInParent().y + it.parentLayoutCoordinates?.positionInParent()?.y!!).toInt()
+                        val positionInParent = it.parentLayoutCoordinates?.positionInParent()!!
+                        boostPosition = IntOffset(
+                            y = (it.positionInParent().y + positionInParent.y).toInt(),
+                            x = -positionInParent.x.toInt(),
+                        )
                     }
             )
 
@@ -136,7 +145,7 @@ fun CardView(
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Medium,
                 ),
-                color = contentColor,
+                color = appearance.contentColor,
             )
 
             Spacer(
@@ -144,7 +153,7 @@ fun CardView(
                     .fillMaxWidth()
                     .height(1.dp)
                     .padding(horizontal = 16.dp)
-                    .background(contentColor)
+                    .background(appearance.contentColor)
             )
 
             Spacer(Modifier.fillMaxWidth().height(8.dp))
@@ -160,15 +169,18 @@ fun CardView(
                     .padding(end = 8.dp),
                 text = "x${data.quantity}",
                 textAlign = TextAlign.End,
-                color = contentColor,
+                color = appearance.contentColor,
             )
         }
 
         BoostCell(
-            modifier = Modifier.offset { IntOffset(x = boostPositionY, y = boostPositionY) },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .offset { boostPosition }
+                .padding(end = 8.dp),
             value = data.boost,
-            backgroundColor = backgroundColor,
-            borderColor = borderColor,
+            backgroundColor = appearance.backgroundColor,
+            borderColor = appearance.borderColor,
         )
     }
 }
@@ -185,7 +197,7 @@ private fun BoostCell(
     val density = LocalDensity.current
     Text(
         modifier = modifier
-            .offset(y = -height/2)
+            .offset(y = -height / 2)
             .clip(shape)
             .onSizeChanged { height = density.run { it.height.toDp() } }
             .width(height)
@@ -242,16 +254,21 @@ private fun DescriptionText(
 }
 
 @Composable
-private fun Shevron(
+private fun ChevronView(
     modifier: Modifier = Modifier,
     icon: Image,
     typeColor: Color,
     value: Int,
     character: String,
-) = Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+) = Column(
+    modifier = modifier,
+    horizontalAlignment = Alignment.CenterHorizontally,
+) {
     CompositionLocalProvider(LocalTextStyle provides cardTitleStyle.copy(fontSize = 42.sp)) {
         Column(
-            modifier = Modifier.background(typeColor),
+            modifier = Modifier
+                .clip(ChevronShape)
+                .background(typeColor),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
@@ -269,6 +286,7 @@ private fun Shevron(
                 )
             }
         }
+        Spacer(Modifier.height(8.dp))
         Text(
             modifier = Modifier
                 .padding(bottom = 16.dp, top = 8.dp)
@@ -276,6 +294,7 @@ private fun Shevron(
                 .rotate(-90f),
             text = character.uppercase(),
         )
+        Spacer(Modifier.height(16.dp))
     }
 }
 
