@@ -25,7 +25,10 @@ internal fun App() = AppTheme(useDarkTheme = true) {
             type = CardData.Type.Standard.atk(
                 value = 3,
                 description = CardData.Type.Description.Combat(
-                    afterText = "If you win move target up by 1 space."
+                    basic = "basic",
+                    immediateText = "immediateText",
+                    duringText = "duringText",
+                    afterText = "afterText",
                 )
             ),
             character = "ITACHI",

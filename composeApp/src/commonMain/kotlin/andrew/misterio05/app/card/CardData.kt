@@ -26,24 +26,14 @@ data class CardData(
         sealed interface Description {
             val basic: String
 
-            data class Basic(override val basic: String) : Description
+            data class Basic(override val basic: String = "") : Description
 
-            @Stable
-            class Combat(
-                basic: String = "",
-                immediateText: String = "",
-                duringText: String = "",
-                afterText: String = "",
-            ) : Description {
-                override val basic: String = basic
-                    .plus(immediateText.combatPart("IMMEDIATLY"))
-                    .plus(duringText.combatPart("DURING COMBAT"))
-                    .plus(afterText.combatPart("AFTER COMBAT"))
-
-                private fun String.combatPart(part: String) = takeIf(String::isNotBlank)
-                    ?.let { "\n$part: $it" }
-                    .orEmpty()
-            }
+            data class Combat(
+                override val basic: String = "",
+                val immediateText: String = "",
+                val duringText: String = "",
+                val afterText: String = "",
+            ) : Description
         }
 
         object Standard {

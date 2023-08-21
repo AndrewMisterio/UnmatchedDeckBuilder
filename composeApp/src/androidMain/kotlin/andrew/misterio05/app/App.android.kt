@@ -37,12 +37,12 @@ class AppActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CompositionLocalProvider(
-                LocalImageLoader provides remember { generateImageLoader() },
-            ) {
-                App()
-            }
+                LocalImageLoader provides remember(::generateImageLoader),
+                content = { App() },
+            )
         }
     }
+
 }
 
 internal actual fun openUrl(url: String?) {
@@ -55,7 +55,7 @@ internal actual fun openUrl(url: String?) {
     AndroidApp.INSTANCE.startActivity(intent)
 }
 
-fun Context.generateImageLoader(): ImageLoader {
+private fun Context.generateImageLoader(): ImageLoader {
     return ImageLoader {
         options {
             androidContext(applicationContext)
