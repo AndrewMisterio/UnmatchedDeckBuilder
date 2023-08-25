@@ -1,6 +1,5 @@
 package andrew.misterio05.app.card
 
-import andrew.misterio05.app.font
 import andrew.misterio05.app.theme.Image
 import andrew.misterio05.app.urlPainter
 import androidx.compose.foundation.Image
@@ -9,7 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -37,178 +36,157 @@ import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val BorderWidth = 4.dp
-
-private val cardTitleStyle = TextStyle(
-    fontFamily = FontFamily(
-        font("bebas_neue_regular", FontWeight.Medium, FontStyle.Normal),
-    ),
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Center,
-        trim = LineHeightStyle.Trim.Both,
-    ),
-)
-private val cardTextStyle = TextStyle(
-    fontFamily = FontFamily(
-        font("archivo_narrow", FontWeight.Medium, FontStyle.Normal),
-    ),
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Center,
-        trim = LineHeightStyle.Trim.Both,
-    ),
-)
-
-data class CardAppearance(
-    val contentColor: Color,
-    val backgroundColor: Color,
-    val borderColor: Color,
-)
 
 @Composable
 fun CardView(
     modifier: Modifier,
     data: CardData,
-    appearance: CardAppearance,
-) = CompositionLocalProvider(
-    LocalTextStyle provides cardTextStyle,
-    LocalContentColor provides appearance.contentColor,
+    appearance: CardColors,
 ) {
-    Box(modifier = modifier) {
+    var size by remember { mutableStateOf(DpSize.Zero) }
+    // 400 is the benchmark card size.
+    val scaleFactor = remember(size.width) { size.width / 400.dp }
+    val density = LocalDensity.current
+
+    CompositionLocalProvider(
+        LocalTextStyle provides cardTextStyle,
+        LocalContentColor provides appearance.content,
+        CardTheme.provideColors(appearance),
+        CardTheme.provideFonts(createCardFonts(scaleFactor)),
+        CardTheme.providePaddings(createCardPaddings(scaleFactor)),
+    ) {
         var boostPosition by remember { mutableStateOf(IntOffset.Zero) }
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(appearance.backgroundColor)
+        Box(
+            modifier = modifier
+                .padding(CardTheme.paddings.medium)
+                .onSizeChanged {
+                    size = density.run { DpSize(it.width.toDp(), it.height.toDp()) }
+                },
         ) {
-            Box(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
+            Column(
+                modifier = Modifier
+                    .aspectRatio(63.5f / 88f)
+                    .align(Alignment.Center)
+                    .clip(RoundedCornerShape(CardTheme.paddings.small))
+                    .background(CardTheme.colors.background)
             ) {
                 Image(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
                     painter = urlPainter(data.imageUrl),
                     contentDescription = "Image of card",
                     contentScale = ContentScale.Crop,
                 )
-                ChevronView(
+
+                Spacer(
+                    modifier = Modifier.fillMaxWidth()
+                        .height(CardTheme.paddings.tiny)
+                        .background(CardTheme.colors.border)
+                        .onPlaced {
+                            val positionInParent = it.parentLayoutCoordinates?.positionInParent()!!
+                            boostPosition = IntOffset(
+                                y = (it.positionInParent().y + positionInParent.y).toInt(),
+                                x = -positionInParent.x.toInt(),
+                            )
+                        }
+                )
+
+                Spacer(Modifier.fillMaxWidth().height(CardTheme.paddings.small))
+
+                Text(
                     modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .offset(x = -BorderWidth, y = -BorderWidth)
-                        .clip(ChevronShape)
-                        .border(
-                            color = appearance.borderColor,
-                            width = BorderWidth,
-                            shape = ChevronShape,
-                        )
-                        .background(appearance.backgroundColor),
-                    icon = data.type.icon,
-                    typeColor = data.type.color,
-                    value = data.type.value,
-                    character = data.character,
+                        .fillMaxWidth()
+                        .padding(horizontal = CardTheme.paddings.medium),
+                    text = data.title.uppercase(),
+                    maxLines = 1,
+                    style = CardTheme.fonts.h2.copy(fontWeight = FontWeight.Medium),
+                )
+
+                Spacer(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .padding(horizontal = CardTheme.paddings.medium)
+                        .background(CardTheme.colors.content)
+                )
+
+                Spacer(Modifier.fillMaxWidth().height(CardTheme.paddings.small))
+
+                DescriptionText(
+                    modifier = Modifier.padding(horizontal = CardTheme.paddings.medium),
+                    data = data.type.description,
+                )
+
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = CardTheme.paddings.small),
+                    text = "x${data.quantity}",
+                    textAlign = TextAlign.End,
+                    style = CardTheme.fonts.body2,
                 )
             }
 
-            Spacer(
-                Modifier.fillMaxWidth()
-                    .height(BorderWidth)
-                    .background(appearance.borderColor)
-                    .onPlaced {
-                        val positionInParent = it.parentLayoutCoordinates?.positionInParent()!!
-                        boostPosition = IntOffset(
-                            y = (it.positionInParent().y + positionInParent.y).toInt(),
-                            x = -positionInParent.x.toInt(),
-                        )
-                    }
+            ChevronView(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset(x = -CardTheme.paddings.tiny, y = -CardTheme.paddings.tiny)
+                    .clip(ChevronShape)
+                    .border(
+                        color = CardTheme.colors.border,
+                        width = CardTheme.paddings.tiny,
+                        shape = ChevronShape,
+                    )
+                    .background(CardTheme.colors.background),
+                icon = data.type.icon,
+                typeColor = data.type.color,
+                value = data.type.value,
+                character = data.character,
             )
-
-            Spacer(Modifier.fillMaxWidth().height(8.dp))
-
+            // Boost circle
+            val shape = remember { RoundedCornerShape(percent = 50) }
+            var height by remember { mutableStateOf(0.dp) }
             Text(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                text = data.title.uppercase(),
-                maxLines = 1,
-                style = cardTitleStyle.copy(
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.Medium,
-                ),
-                color = appearance.contentColor,
-            )
-
-            Spacer(
-                Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .padding(horizontal = 16.dp)
-                    .background(appearance.contentColor)
-            )
-
-            Spacer(Modifier.fillMaxWidth().height(8.dp))
-
-            DescriptionText(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                data = data.type.description,
-            )
-
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 8.dp),
-                text = "x${data.quantity}",
-                textAlign = TextAlign.End,
-                color = appearance.contentColor,
+                    .align(Alignment.TopEnd)
+                    .offset { boostPosition }
+                    .padding(end = CardTheme.paddings.small)
+                    .offset(y = -height / 2)
+                    .clip(shape)
+                    .onSizeChanged { height = density.run { it.height.toDp() } }
+                    .width(height)
+                    .background(CardTheme.colors.background)
+                    .border(CardTheme.paddings.tiny, CardTheme.colors.border, shape)
+                    .padding(CardTheme.paddings.tiny),
+                text = data.boost.toString(),
+                style = CardTheme.fonts.body1,
+                textAlign = TextAlign.Center,
             )
         }
-
-        BoostCell(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .offset { boostPosition }
-                .padding(end = 8.dp),
-            value = data.boost,
-            backgroundColor = appearance.backgroundColor,
-            borderColor = appearance.borderColor,
-        )
     }
 }
 
-@Composable
-private fun BoostCell(
-    modifier: Modifier,
-    backgroundColor: Color,
-    borderColor: Color,
-    value: Int,
-) {
-    val shape = remember { RoundedCornerShape(percent = 50) }
-    var height by remember { mutableStateOf(0.dp) }
-    val density = LocalDensity.current
-    Text(
-        modifier = modifier
-            .offset(y = -height / 2)
-            .clip(shape)
-            .onSizeChanged { height = density.run { it.height.toDp() } }
-            .width(height)
-            .background(backgroundColor)
-            .border(BorderWidth, borderColor, shape)
-            .padding(4.dp),
-        text = value.toString(),
-        style = cardTitleStyle.copy(fontSize = 24.sp),
-        textAlign = TextAlign.Center,
-    )
-}
+private fun createCardPaddings(scaleFactor: Float) = CardPaddings(
+    small = 8.dp * scaleFactor,
+    medium = 16.dp * scaleFactor,
+    tiny = 4.dp * scaleFactor,
+)
+
+private fun createCardFonts(scaleFactor: Float) = CardFonts(
+    h1 = cardTitleStyle.copy(fontSize = 42.sp * scaleFactor),
+    h2 = cardTitleStyle.copy(fontSize = 36.sp * scaleFactor),
+    body1 = cardTitleStyle.copy(fontSize = 24.sp * scaleFactor),
+    body2 = cardTextStyle.copy(fontSize = 24.sp * scaleFactor),
+)
 
 @Composable
 private fun DescriptionText(
@@ -219,19 +197,15 @@ private fun DescriptionText(
     fun annotation(part: String, value: String) = Text(
         modifier = Modifier.fillMaxWidth(),
         text = buildAnnotatedString {
+            val fonts = CardTheme.fonts
             if (part.isNotEmpty()) {
-                withStyle(remember {
-                    cardTitleStyle.copy(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 24.sp
-                    ).toSpanStyle()
-                }) {
-                    append("$part: ")
+                val partStyle = remember(fonts.body1) {
+                    fonts.body1.copy(fontWeight = FontWeight.Medium).toSpanStyle()
                 }
+                withStyle(partStyle) { append("$part: ") }
             }
-            withStyle(remember { cardTextStyle.copy(fontSize = 24.sp).toSpanStyle() }) {
-                append(value)
-            }
+            val textStyle = remember(fonts.body2) { fonts.body2.toSpanStyle() }
+            withStyle(textStyle) { append(value) }
         },
     )
     if (data.basic.isNotEmpty()) {
@@ -264,38 +238,41 @@ private fun ChevronView(
     modifier = modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
 ) {
-    CompositionLocalProvider(LocalTextStyle provides cardTitleStyle.copy(fontSize = 42.sp)) {
-        Column(
+    val padding = CardTheme.paddings.medium
+    Column(
+        modifier = Modifier
+            .clip(ChevronShape)
+            .background(typeColor),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
             modifier = Modifier
-                .clip(ChevronShape)
-                .background(typeColor),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp, bottom = 0.dp, top = 16.dp)
-                    .height(36.dp),
-                painter = icon(),
-                contentDescription = "icon of type",
-            )
-            if (value >= 0) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = value.toString(),
-                    textAlign = TextAlign.Center,
-                )
-            }
-        }
-        Spacer(Modifier.height(8.dp))
-        Text(
-            modifier = Modifier
-                .padding(bottom = 16.dp, top = 8.dp)
-                .vertical()
-                .rotate(-90f),
-            text = character.uppercase(),
+                .padding(start = padding, end = padding, bottom = 0.dp, top = padding)
+                .height(LocalDensity.current.run { CardTheme.fonts.h1.fontSize.toDp() }),
+            painter = icon(),
+            contentDescription = "icon of type",
         )
-        Spacer(Modifier.height(16.dp))
+        if (value >= 0) {
+            Text(
+                modifier = Modifier.padding(horizontal = padding),
+                text = value.toString(),
+                textAlign = TextAlign.Center,
+                style = CardTheme.fonts.h1,
+            )
+        }
     }
+    Spacer(Modifier.height(CardTheme.paddings.small))
+    Text(
+        modifier = Modifier
+            .padding(bottom = padding, top = CardTheme.paddings.small)
+            .vertical()
+            .rotate(-90f),
+        text = character.uppercase(),
+        maxLines = 1,
+        overflow = TextOverflow.Visible,
+        style = CardTheme.fonts.h1,
+    )
+    Spacer(Modifier.height(padding))
 }
 
 fun Modifier.vertical() = layout { measurable, constraints ->

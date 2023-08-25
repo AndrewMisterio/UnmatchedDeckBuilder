@@ -1,6 +1,6 @@
 package andrew.misterio05.app
 
-import andrew.misterio05.app.card.CardAppearance
+import andrew.misterio05.app.card.CardColors
 import andrew.misterio05.app.card.CardData
 import andrew.misterio05.app.card.CardView
 import andrew.misterio05.app.theme.AppTheme
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 internal fun App() = AppTheme(useDarkTheme = true) {
     val borderColor = remember { Color(246, 234, 219) }
     CardView(
-        modifier = Modifier.width(400.dp).aspectRatio(63.5f / 88f).background(borderColor),
+        modifier = Modifier.width(300.dp).background(borderColor),
         data = CardData(
             title = "Suiton: Suigadan",
             type = CardData.Type.Standard.atk(
@@ -37,10 +37,10 @@ internal fun App() = AppTheme(useDarkTheme = true) {
             imageUrl = "https://wiki.jcdn.ru/w/images/thumb/f/f3/Suigadan.jpg/450px-Suigadan.jpg",
             quantity = 2,
         ),
-        appearance = CardAppearance(
-            contentColor = Color.White,
-            backgroundColor = Color.Black,
-            borderColor = borderColor,
+        appearance = CardColors(
+            content = Color.White,
+            background = Color.Black,
+            border = borderColor,
         ),
     )
 }
