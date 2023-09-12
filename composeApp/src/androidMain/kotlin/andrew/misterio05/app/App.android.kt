@@ -1,10 +1,11 @@
 package andrew.misterio05.app
 
+import andrew.misterio05.app.features.app.AppEffectHandler
+import andrew.misterio05.app.features.characters.CharactersEffectHandler
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
+import android.content.res.Resources
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,38 +22,25 @@ import com.seiko.imageloader.option.androidContext
 import okio.Path.Companion.toOkioPath
 
 class AndroidApp : Application() {
-    companion object {
-        lateinit var INSTANCE: AndroidApp
-            private set
-    }
 
-    override fun onCreate() {
-        super.onCreate()
-        INSTANCE = this
-    }
+    internal val appEffectHandler = AppEffectHandler(
+        charactersEffectHandler = CharactersEffectHandler(),
+    )
 }
 
 class AppActivity : ComponentActivity() {
+
+    private val app = applicationContext as AndroidApp
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             CompositionLocalProvider(
                 LocalImageLoader provides remember(::generateImageLoader),
-                content = { App() },
+                content = { App(app.appEffectHandler) },
             )
         }
     }
-
-}
-
-internal actual fun openUrl(url: String?) {
-    val uri = url?.let { Uri.parse(it) } ?: return
-    val intent = Intent().apply {
-        action = Intent.ACTION_VIEW
-        data = uri
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
-    AndroidApp.INSTANCE.startActivity(intent)
 }
 
 private fun Context.generateImageLoader(): ImageLoader {
@@ -78,7 +66,7 @@ private fun Context.generateImageLoader(): ImageLoader {
 
 @SuppressLint("DiscouragedApi")
 internal actual fun font(res: String, weight: FontWeight, style: FontStyle): Font {
-    val app = AndroidApp.INSTANCE
-    val id = app.resources.getIdentifier(res, "font", app.packageName)
+    val resources = Resources.getSystem()
+    val id = resources.getIdentifier(res, "font", resources.getString(R.string.app_id))
     return Font(id, weight, style)
 }

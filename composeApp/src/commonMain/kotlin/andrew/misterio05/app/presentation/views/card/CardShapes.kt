@@ -1,4 +1,4 @@
-package andrew.misterio05.app.card
+package andrew.misterio05.app.presentation.views.card
 
 import androidx.compose.foundation.shape.GenericShape
 

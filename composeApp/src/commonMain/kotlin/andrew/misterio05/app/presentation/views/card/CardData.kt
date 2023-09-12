@@ -1,11 +1,11 @@
-package andrew.misterio05.app.card
+package andrew.misterio05.app.presentation.views.card
 
 import andrew.misterio05.app.Res
-import andrew.misterio05.app.card.icons.Bolt
-import andrew.misterio05.app.card.icons.CardIcons
-import andrew.misterio05.app.card.icons.Shield
-import andrew.misterio05.app.card.icons.ShieldExplosion
-import andrew.misterio05.app.theme.Image
+import andrew.misterio05.app.presentation.views.card.icons.Bolt
+import andrew.misterio05.app.presentation.views.card.icons.CardIcons
+import andrew.misterio05.app.presentation.views.card.icons.Shield
+import andrew.misterio05.app.presentation.views.card.icons.ShieldExplosion
+import andrew.misterio05.app.presentation.theme.Image
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 

@@ -1,4 +1,4 @@
-package andrew.misterio05.app.card.icons
+package andrew.misterio05.app.presentation.views.card.icons
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType

@@ -1,7 +1,7 @@
 [versions]
 
 kotlin = "1.9.0"
-agp = "8.1.0"
+agp = "8.1.1"
 compose = "1.4.3"
 androidx-appcompat = "1.6.1"
 androidx-activityCompose = "1.7.2"
@@ -16,6 +16,8 @@ composeIcons = "1.1.0"
 kotlinx-serialization = "1.5.1"
 multiplatformSettings = "1.0.0"
 kstore = "0.6.0"
+orbit = "6.0.0"
+kotlinxCollectionsImmutable = "0.3.5"
 
 [libraries]
 
@@ -32,6 +34,9 @@ composeIcons-featherIcons = { module = "br.com.devsrsouza.compose.icons:feather"
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
+orbit = { module = "org.orbit-mvi:orbit-core", version.ref = "orbit" }
+orbit-compose = { module = "org.orbit-mvi:orbit-compose", version.ref = "orbit" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 
 [plugins]
 

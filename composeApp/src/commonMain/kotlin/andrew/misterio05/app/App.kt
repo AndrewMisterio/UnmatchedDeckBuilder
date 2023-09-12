@@ -1,50 +1,58 @@
 package andrew.misterio05.app
 
-import andrew.misterio05.app.card.CardColors
-import andrew.misterio05.app.card.CardData
-import andrew.misterio05.app.card.CardView
-import andrew.misterio05.app.theme.AppTheme
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.width
+import andrew.misterio05.app.features.StateHolder
+import andrew.misterio05.app.features.app.AppEffectHandler
+import andrew.misterio05.app.features.app.AppEvent
+import andrew.misterio05.app.features.app.AppReducer
+import andrew.misterio05.app.features.app.AppState
+import andrew.misterio05.app.features.characters.CharactersState
+import andrew.misterio05.app.presentation.screens.ListScreen
+import andrew.misterio05.app.presentation.theme.AppTheme
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-internal fun App() = AppTheme(useDarkTheme = true) {
-    val borderColor = remember { Color(246, 234, 219) }
-    CardView(
-        modifier = Modifier.width(300.dp).background(borderColor),
-        data = CardData(
-            title = "Suiton: Suigadan",
-            type = CardData.Type.Standard.atk(
-                value = 3,
-                description = CardData.Type.Description.Combat(
-                    /*basic = "basic",
-                    immediateText = "immediateText",
-                    duringText = "duringText",*/
-                    afterText = "afterText",
-                )
-            ),
-            character = "ITACHI",
-            boost = 1,
-            imageUrl = "https://wiki.jcdn.ru/w/images/thumb/f/f3/Suigadan.jpg/450px-Suigadan.jpg",
-            quantity = 2,
-        ),
-        appearance = CardColors(
-            content = Color.White,
-            background = Color.Black,
-            border = borderColor,
-        ),
-    )
-}
+internal fun App(
+    effectHandler: AppEffectHandler,
+) = AppTheme(useDarkTheme = true) {
 
-internal expect fun openUrl(url: String?)
+    val stateHolder = remember {
+        StateHolder(
+            AppState(navigation = AppState.Navigation(list = CharactersState())),
+            AppReducer::invoke,
+        )
+    }
+
+    val state by stateHolder.state.collectAsState()
+
+    updateTransition(targetState = state.navigation.current, label = "root").AnimatedContent(
+        modifier = Modifier.fillMaxSize(),
+        contentKey = { if (it != null) it::class else null },
+    ) { screen ->
+        when (screen) {
+            is CharactersState -> ListScreen(Modifier, screen, stateHolder::dispatch)
+        }
+    }
+
+    LaunchedEffect(stateHolder.events) {
+        stateHolder.dispatch(AppEvent.OnAppStarted)
+        stateHolder.events.collect { effect ->
+            launch { effectHandler.run { execute(effect, stateHolder::dispatch) } }
+        }
+    }
+}
 
 internal expect fun font(res: String, weight: FontWeight, style: FontStyle): Font

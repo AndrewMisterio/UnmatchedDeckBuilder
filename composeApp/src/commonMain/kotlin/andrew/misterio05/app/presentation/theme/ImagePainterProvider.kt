@@ -1,4 +1,4 @@
-package andrew.misterio05.app.theme
+package andrew.misterio05.app.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter

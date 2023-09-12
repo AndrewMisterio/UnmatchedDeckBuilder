@@ -1,4 +1,4 @@
-package andrew.misterio05.app.card
+package andrew.misterio05.app.presentation.views.card
 
 import andrew.misterio05.app.font
 import androidx.compose.runtime.Composable

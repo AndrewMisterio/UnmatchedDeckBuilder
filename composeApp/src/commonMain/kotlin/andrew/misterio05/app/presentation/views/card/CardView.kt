@@ -1,6 +1,7 @@
-package andrew.misterio05.app.card
+package andrew.misterio05.app.presentation.views.card
 
-import andrew.misterio05.app.theme.Image
+import andrew.misterio05.app.presentation.CARD_RATIO
+import andrew.misterio05.app.presentation.theme.Image
 import andrew.misterio05.app.urlPainter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -75,7 +76,7 @@ fun CardView(
         ) {
             Column(
                 modifier = Modifier
-                    .aspectRatio(63.5f / 88f)
+                    .aspectRatio(CARD_RATIO)
                     .align(Alignment.Center)
                     .clip(RoundedCornerShape(CardTheme.paddings.small))
                     .background(CardTheme.colors.background)

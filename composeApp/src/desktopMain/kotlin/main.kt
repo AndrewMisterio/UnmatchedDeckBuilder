@@ -1,4 +1,6 @@
 import andrew.misterio05.app.App
+import andrew.misterio05.app.features.app.AppEffectHandler
+import andrew.misterio05.app.features.characters.CharactersEffectHandler
 import andrew.misterio05.app.generateImageLoader
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -10,16 +12,21 @@ import com.seiko.imageloader.LocalImageLoader
 
 internal const val ApplicationName = "UnmatchedDeckBuilder"
 
-fun main() = application {
-    Window(
-        title = ApplicationName,
-        state = rememberWindowState(width = 800.dp, height = 600.dp),
-        onCloseRequest = ::exitApplication,
-        content = {
-            CompositionLocalProvider(
-                LocalImageLoader provides remember(::generateImageLoader),
-                content = { App() },
-            )
-        },
+fun main() {
+    val appEffectHandler = AppEffectHandler(
+        charactersEffectHandler = CharactersEffectHandler(),
     )
+    application {
+        Window(
+            title = ApplicationName,
+            state = rememberWindowState(width = 800.dp, height = 600.dp),
+            onCloseRequest = ::exitApplication,
+            content = {
+                CompositionLocalProvider(
+                    LocalImageLoader provides remember(::generateImageLoader),
+                    content = { App(appEffectHandler) },
+                )
+            },
+        )
+    }
 }
