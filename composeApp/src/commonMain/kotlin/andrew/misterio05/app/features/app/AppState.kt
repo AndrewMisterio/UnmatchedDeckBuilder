@@ -8,6 +8,7 @@ data class AppState(
     data class Navigation(
         val list: State? = null,
         val details: State? = null,
+        val dialog: State? = null,
     ) {
         val current get() = details ?: list
     }

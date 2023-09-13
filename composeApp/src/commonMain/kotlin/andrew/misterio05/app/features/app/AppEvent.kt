@@ -4,4 +4,5 @@ import andrew.misterio05.app.features.Event
 
 sealed interface AppEvent: Event {
     data object OnAppStarted: AppEvent
+    data object CloseDialog: AppEvent
 }

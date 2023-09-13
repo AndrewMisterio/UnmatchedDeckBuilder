@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
 
@@ -60,7 +59,7 @@ fun ListScreen(
         LazyVerticalGrid(
             modifier = Modifier
                 .fillMaxSize()
-                .onSizeChanged { isWidth = it.width > it.height },
+                .onSizeChanged { isWidth = it.width * 2 > it.height },
             columns = gridCells,
         ) {
             items(state.items) {

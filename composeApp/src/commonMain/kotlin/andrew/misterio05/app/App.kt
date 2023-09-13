@@ -1,17 +1,22 @@
 package andrew.misterio05.app
 
+import andrew.misterio05.app.features.Event
+import andrew.misterio05.app.features.State
 import andrew.misterio05.app.features.StateHolder
 import andrew.misterio05.app.features.app.AppEffectHandler
 import andrew.misterio05.app.features.app.AppEvent
 import andrew.misterio05.app.features.app.AppReducer
 import andrew.misterio05.app.features.app.AppState
+import andrew.misterio05.app.features.character.CharacterState
 import andrew.misterio05.app.features.characters.CharactersState
+import andrew.misterio05.app.presentation.screens.CharacterScreen
 import andrew.misterio05.app.presentation.screens.ListScreen
 import andrew.misterio05.app.presentation.theme.AppTheme
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -31,8 +37,8 @@ internal fun App(
 
     val stateHolder = remember {
         StateHolder(
-            AppState(navigation = AppState.Navigation(list = CharactersState())),
-            AppReducer::invoke,
+            init = AppState(navigation = AppState.Navigation(list = CharactersState())),
+            reducer = AppReducer::invoke,
         )
     }
 
@@ -42,8 +48,20 @@ internal fun App(
         modifier = Modifier.fillMaxSize(),
         contentKey = { if (it != null) it::class else null },
     ) { screen ->
-        when (screen) {
-            is CharactersState -> ListScreen(Modifier, screen, stateHolder::dispatch)
+        val modifier = Modifier.fillMaxSize()
+        // TODO Create screen container with own state and nav bar
+        Screen(screen = screen, modifier = modifier, dispatch = stateHolder::dispatch)
+    }
+
+    state.navigation.dialog?.let { dialog ->
+        Dialog(
+            onCloseRequest = remember { { stateHolder.dispatch(AppEvent.CloseDialog) } },
+        ) {
+            Screen(
+                screen = dialog,
+                modifier = Modifier.wrapContentSize(),
+                dispatch = stateHolder::dispatch,
+            )
         }
     }
 
@@ -52,6 +70,18 @@ internal fun App(
         stateHolder.events.collect { effect ->
             launch { effectHandler.run { execute(effect, stateHolder::dispatch) } }
         }
+    }
+}
+
+@Composable
+private fun Screen(
+    screen: State?,
+    modifier: Modifier,
+    dispatch: (Event) -> Unit,
+) {
+    when (screen) {
+        is CharactersState -> ListScreen(modifier, screen, dispatch)
+        is CharacterState -> CharacterScreen(modifier, screen, dispatch)
     }
 }
 
