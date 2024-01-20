@@ -21,6 +21,7 @@ fun TextField(
     modifier: Modifier,
     text: String,
     label: String? = null,
+    isSingleLine: Boolean = false,
     onTextChanged: (String) -> Unit,
 ) {
     var value by remember { mutableStateOf(text) }
@@ -29,6 +30,7 @@ fun TextField(
         modifier = modifier,
         label = label?.let { { Text(text = it) } },
         value = value,
+        singleLine = isSingleLine,
         onValueChange = { value = it },
     )
 

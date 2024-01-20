@@ -5,10 +5,11 @@ import andrew.misterio05.app.features.State
 import andrew.misterio05.app.features.StateHolder
 import andrew.misterio05.app.features.app.AppEffectHandler
 import andrew.misterio05.app.features.app.AppEvent
-import andrew.misterio05.app.features.app.AppReducer
+import andrew.misterio05.app.features.app.reducer.AppReducer
 import andrew.misterio05.app.features.app.AppState
 import andrew.misterio05.app.features.character.CharacterState
 import andrew.misterio05.app.features.characters.CharactersState
+import andrew.misterio05.app.features.main.MainState
 import andrew.misterio05.app.presentation.screens.CharacterScreen
 import andrew.misterio05.app.presentation.screens.ListScreen
 import andrew.misterio05.app.presentation.theme.AppTheme
@@ -37,14 +38,14 @@ internal fun App(
 
     val stateHolder = remember {
         StateHolder(
-            init = AppState(navigation = AppState.Navigation(list = CharactersState())),
+            init = AppState(main = MainState(list = CharactersState(), details = CharacterState.new())),
             reducer = AppReducer::invoke,
         )
     }
 
     val state by stateHolder.state.collectAsState()
 
-    updateTransition(targetState = state.navigation.current, label = "root").AnimatedContent(
+    updateTransition(targetState = state.main.current, label = "root").AnimatedContent(
         modifier = Modifier.fillMaxSize(),
         contentKey = { if (it != null) it::class else null },
     ) { screen ->
@@ -53,7 +54,7 @@ internal fun App(
         Screen(screen = screen, modifier = modifier, dispatch = stateHolder::dispatch)
     }
 
-    state.navigation.dialog?.let { dialog ->
+    state.main.dialog?.let { dialog ->
         Dialog(
             onCloseRequest = remember { { stateHolder.dispatch(AppEvent.CloseDialog) } },
         ) {

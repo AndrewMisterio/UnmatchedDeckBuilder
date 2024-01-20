@@ -11,6 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
 object CardTheme {
@@ -41,8 +42,16 @@ private val LocalCardFonts = compositionLocalOf {
     CardFonts(
         h1 = cardTitleStyle.copy(fontSize = 42.sp),
         h2 = cardTitleStyle.copy(fontSize = 36.sp),
-        body1 = cardTitleStyle.copy(fontSize = 24.sp),
-        body2 = cardTextStyle.copy(fontSize = 24.sp),
+        body1 = cardTitleStyle.copy(
+            fontSize = 24.sp,
+            lineHeight = 0.em,
+            letterSpacing = 0.sp,
+        ),
+        body2 = cardTextStyle.copy(
+            fontSize = 24.sp,
+            lineHeight = 0.em,
+            letterSpacing = 0.sp,
+        ),
     )
 }
 

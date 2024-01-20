@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -47,9 +48,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-
 @Composable
-fun CardView(
+fun GameCardView(
     modifier: Modifier,
     data: CardData,
     appearance: CardColors,
@@ -69,6 +69,7 @@ fun CardView(
         var boostPosition by remember { mutableStateOf(IntOffset.Zero) }
         Box(
             modifier = modifier
+                .aspectRatio(CARD_RATIO)
                 .padding(CardTheme.paddings.medium)
                 .onSizeChanged {
                     size = density.run { DpSize(it.width.toDp(), it.height.toDp()) }
@@ -76,7 +77,6 @@ fun CardView(
         ) {
             Column(
                 modifier = Modifier
-                    .aspectRatio(CARD_RATIO)
                     .align(Alignment.Center)
                     .clip(RoundedCornerShape(CardTheme.paddings.small))
                     .background(CardTheme.colors.background)
@@ -248,7 +248,8 @@ private fun ChevronView(
     ) {
         Icon(
             modifier = Modifier
-                .padding(start = padding, end = padding, bottom = 0.dp, top = padding)
+                .padding(horizontal = padding)
+                .padding(top = padding)
                 .height(LocalDensity.current.run { CardTheme.fonts.h1.fontSize.toDp() }),
             painter = icon(),
             contentDescription = "icon of type",
@@ -260,6 +261,8 @@ private fun ChevronView(
                 textAlign = TextAlign.Center,
                 style = CardTheme.fonts.h1,
             )
+        } else {
+            Spacer(Modifier.size(padding))
         }
     }
     Spacer(Modifier.height(CardTheme.paddings.small))

@@ -18,6 +18,7 @@ multiplatformSettings = "1.0.0"
 kstore = "0.6.0"
 orbit = "6.0.0"
 kotlinxCollectionsImmutable = "0.3.5"
+arrow = "1.2.0"
 
 [libraries]
 
@@ -37,6 +38,9 @@ kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 orbit = { module = "org.orbit-mvi:orbit-core", version.ref = "orbit" }
 orbit-compose = { module = "org.orbit-mvi:orbit-compose", version.ref = "orbit" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+arrow-optics = { module = "io.arrow-kt:arrow-optics", version.ref = "arrow" }
+arrow-fx-coroutines = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrow" }
 
 [plugins]
 

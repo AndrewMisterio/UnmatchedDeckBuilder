@@ -63,6 +63,9 @@ kotlin {
                 implementation(libs.multiplatformSettings)
                 implementation(libs.kstore)
                 implementation(libs.kotlinx.collections.immutable)
+                implementation(libs.arrow.core)
+                implementation(libs.arrow.fx.coroutines)
+                implementation(libs.arrow.optics)
             }
         }
 

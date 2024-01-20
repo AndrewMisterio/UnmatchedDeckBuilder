@@ -5,7 +5,7 @@ import andrew.misterio05.app.features.just
 import andrew.misterio05.app.features.with
 import kotlinx.collections.immutable.toPersistentList
 
-val CharactersReducer = Reducer<CharactersState, CharactersEvent> { state, event ->
+val CharactersReducer = Reducer<CharactersState, CharactersEvent.Internal> { state, event ->
     when (event) {
         is CharactersEvent.OnListLoaded -> {
             state.copy(
@@ -13,14 +13,6 @@ val CharactersReducer = Reducer<CharactersState, CharactersEvent> { state, event
                 isLoading = false
             )
                 .just()
-        }
-
-        is CharactersEvent.CreateNewCharacter -> {
-            state.just()
-        }
-
-        is CharactersEvent.OpenDetails -> {
-            state.with(CharactersEffect.LoadList)
         }
     }
 }
