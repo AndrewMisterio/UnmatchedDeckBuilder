@@ -1,6 +1,6 @@
 import andrew.misterio05.app.App
 import andrew.misterio05.app.features.app.AppEffectHandler
-import andrew.misterio05.app.features.characters.CharactersEffectHandler
+import andrew.misterio05.app.features.categories.CategoriesEffectHandler
 import andrew.misterio05.app.generateImageLoader
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -12,9 +12,9 @@ import com.seiko.imageloader.LocalImageLoader
 
 internal const val ApplicationName = "UnmatchedDeckBuilder"
 
-fun main() {
+fun main(vararg args: String) {
     val appEffectHandler = AppEffectHandler(
-        charactersEffectHandler = CharactersEffectHandler(),
+        categoriesEffectHandler = CategoriesEffectHandler(),
     )
     application {
         Window(
@@ -24,7 +24,12 @@ fun main() {
             content = {
                 CompositionLocalProvider(
                     LocalImageLoader provides remember(::generateImageLoader),
-                    content = { App(appEffectHandler) },
+                    content = {
+                        App(
+                            effectHandler = appEffectHandler,
+                            deeplink = args.getOrNull(0),
+                        )
+                    },
                 )
             },
         )

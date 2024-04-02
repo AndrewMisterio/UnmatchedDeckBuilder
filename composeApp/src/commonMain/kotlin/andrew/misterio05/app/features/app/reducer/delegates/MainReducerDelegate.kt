@@ -16,7 +16,7 @@ fun AppState.onMainEvent(event: MainEvent): ReducerResult<AppState> {
 
 inline fun <reified T: State> AppState.onScreen(reduce: (T) -> ReducerResult<T>): ReducerResult<AppState> {
     val mainReduceResult: ReducerResult<MainState>? =  when {
-        main.list is T -> reduce(main.list).let { main.copy(list = it.state).with(it.effects) }
+        main.categories is T -> reduce(main.categories).let { main.copy(categories = it.state).with(it.effects) }
         main.details is T -> reduce(main.details).let { main.copy(details = it.state).with(it.effects) }
         main.dialog is T -> reduce(main.dialog).let { main.copy(dialog = it.state).with(it.effects) }
         else -> null
